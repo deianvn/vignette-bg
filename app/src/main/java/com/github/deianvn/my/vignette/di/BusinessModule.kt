@@ -1,11 +1,11 @@
 package com.github.deianvn.my.vignette.di
 
-import com.github.deianvn.my.vignette.main.MainActivityViewModel
-import com.github.deianvn.my.vignette.repository.CountryRepository
-import com.github.deianvn.my.vignette.repository.ValidityRepository
-import com.github.deianvn.my.vignette.repository.VignetteConfigRepository
-import com.github.deianvn.my.vignette.repository.VignetteRepository
-import org.koin.androidx.viewmodel.dsl.viewModel
+import com.github.deianvn.my.vignette.presentation.activity.main.MainViewModel
+import com.github.deianvn.my.vignette.state.repository.CountryRepository
+import com.github.deianvn.my.vignette.state.repository.ValidityRepository
+import com.github.deianvn.my.vignette.state.repository.VignetteConfigRepository
+import com.github.deianvn.my.vignette.state.repository.VignetteRepository
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val BusinessModule = module {
@@ -27,7 +27,7 @@ val BusinessModule = module {
     }
 
     viewModel {
-        MainActivityViewModel(get(), get(), get(), get())
+        MainViewModel(get(), get(), get(), get())
     }
 
 }
