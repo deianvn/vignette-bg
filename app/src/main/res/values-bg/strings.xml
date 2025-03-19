@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">BgVignette</string>
     <string name="add_new_vignette">Add new vignette</string>
@@ -33,5 +34,4 @@
         <item quantity="one">minute</item>
         <item quantity="other">minutes</item>
     </plurals>
-
 </resources>

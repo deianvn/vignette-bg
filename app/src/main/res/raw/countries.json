@@ -1,5 +1,9 @@
 [
   {
+    "name": "Bulgaria",
+    "code": "BG"
+  },
+  {
     "name": "Afghanistan",
     "code": "AF"
   },
@@ -130,10 +134,6 @@
   {
     "name": "Brunei Darussalam",
     "code": "BN"
-  },
-  {
-    "name": "Bulgaria",
-    "code": "BG"
   },
   {
     "name": "Burkina Faso",

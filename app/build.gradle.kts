@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.github.deianvn.my.vignette"
+    namespace = "com.github.deianvn.bg.vignette"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.github.deianvn.my.vignette"
+        applicationId = "com.github.deianvn.bg.vignette"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -47,30 +47,25 @@ dependencies {
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycle")
-    implementation("androidx.activity:activity-compose:1.10.0")
+    implementation("androidx.activity:activity-compose:1.10.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
 
-    val composebom = "2025.01.00"
+    val composebom = "2025.03.00"
     implementation(platform("androidx.compose:compose-bom:$composebom"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.runtime:runtime-livedata")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
 
     // Koin for Android
-    api("io.insert-koin:koin-core:4.0.2")
-    api("io.insert-koin:koin-android:4.0.2")
+    implementation("io.insert-koin:koin-core:4.0.2")
+    implementation("io.insert-koin:koin-android:4.0.2")
+    implementation("io.insert-koin:koin-androidx-compose:4.0.2")
 
     // Timber
     implementation("com.jakewharton.timber:timber:5.0.1")
-
-    // RxJava
-    implementation("io.reactivex.rxjava3:rxjava:3.1.10")
-    implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
-
-    // RxBindings
-    implementation("com.jakewharton.rxbinding4:rxbinding:4.0.0")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
