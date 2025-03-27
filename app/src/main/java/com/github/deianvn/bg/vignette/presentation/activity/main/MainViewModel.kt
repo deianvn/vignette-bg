@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.deianvn.bg.vignette.state.Plot
 import com.github.deianvn.bg.vignette.state.Scene
 import com.github.deianvn.bg.vignette.state.Status
+import com.github.deianvn.bg.vignette.state.error.StateError
 import com.github.deianvn.bg.vignette.state.error.VignetteNotAvailableError
 import com.github.deianvn.bg.vignette.state.model.Country
 import com.github.deianvn.bg.vignette.state.model.VignetteEntry
@@ -18,6 +19,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 
 class MainViewModel(
@@ -43,21 +45,26 @@ class MainViewModel(
 
     init {
         viewModelScope.launch {
-            _scene.value = _scene.value.next(
-                status = Status.LOADING,
-                act = Prerequisites()
-            )
+            try {
+                _scene.value = _scene.value.next(
+                    status = Status.LOADING,
+                    act = Prerequisites()
+                )
 
-            loadPrerequisites()
+                loadPrerequisites()
 
-            _scene.value = _scene.value.next(
-                status = Status.LOADING,
-                act = VignetteList()
-            )
+                _scene.value = _scene.value.next(
+                    status = Status.LOADING,
+                    act = VignetteList()
+                )
 
-            loadVignettes()
+                loadVignettes()
 
-            _scene.value = _scene.value.success()
+                _scene.value = _scene.value.next(status = Status.SUCCESS)
+            } catch (e: StateError) {
+                Timber.e(e, "Could not load prerequisites.")
+                _scene.value = _scene.value.next(status = Status.ERROR, fault = e)
+            }
         }
     }
 
@@ -73,6 +80,7 @@ class MainViewModel(
         sharedPlot.countriesMap = countries.associateBy { it.code }
     }
 
+    @Throws(StateError::class)
     private suspend fun loadVignettes() = coroutineScope {
 
         val vignetteEntries = vignetteRepository.retrieveVignetteEntries()
@@ -86,8 +94,12 @@ class MainViewModel(
                         plate = entry.plate
                     )
                 } catch (e: VignetteNotAvailableError) {
+                    Timber.w(
+                        e,
+                        "vignette not available with countryCode, plate: ${entry.countryCode}, ${entry.plate}"
+                    )
                     null
-                } catch (e: Exception) {
+                } catch (e: StateError) {
                     throw e
                 }
                 entry.vignette = vignette
@@ -113,7 +125,7 @@ class MainViewModel(
     }
 
     fun addVignette(countryCode: String, plate: String) {
-        _scene.value = _scene.value.loading()
+        _scene.value = _scene.value.next(status = Status.LOADING)
 
         viewModelScope.launch {
 
@@ -122,30 +134,34 @@ class MainViewModel(
             }
 
             if (vignetteExists) {
-                //TODO send error
                 _scene.value = _scene.value.next(
                     status = Status.SUCCESS,
                     act = VignetteList()
                 )
             } else {
 
-                vignetteRepository.storeVignetteEntries(
-                    sharedPlot.vignetteEntries + VignetteEntry(countryCode, plate)
-                )
+                try {
+                    vignetteRepository.storeVignetteEntries(
+                        sharedPlot.vignetteEntries + VignetteEntry(countryCode, plate)
+                    )
 
-                loadPrerequisites()
-                loadVignettes()
+                    loadPrerequisites()
+                    loadVignettes()
 
-                _scene.value = _scene.value.next(
-                    status = Status.SUCCESS,
-                    act = VignetteList()
-                )
+                    _scene.value = _scene.value.next(
+                        status = Status.SUCCESS,
+                        act = VignetteList()
+                    )
+                } catch (e: StateError) {
+                    Timber.e(e, "Could not add vignette.")
+                    _scene.value = _scene.value.next(status = Status.ERROR, fault = e)
+                }
             }
         }
     }
 
     fun removeVignetteEntry(vignette: VignetteEntry) {
-        _scene.value = _scene.value.loading()
+        _scene.value = _scene.value.next(status = Status.LOADING)
 
         viewModelScope.launch {
             vignetteRepository.storeVignetteEntries(
@@ -154,13 +170,43 @@ class MainViewModel(
                 }
             )
 
-            loadVignettes()
+            try {
+                loadVignettes()
 
-            _scene.value = _scene.value.next(
-                status = Status.SUCCESS,
-                act = VignetteList()
-            )
+                _scene.value = _scene.value.next(
+                    status = Status.SUCCESS,
+                    act = VignetteList()
+                )
+            } catch (e: StateError) {
+                Timber.e(e, "Could not load vignettes when removing.")
+                _scene.value = _scene.value.next(status = Status.ERROR, fault = e)
+            }
         }
+    }
+
+    fun refreshVignettes() {
+        _scene.value = _scene.value.next(status = Status.LOADING)
+
+        viewModelScope.launch {
+            try {
+                loadVignettes()
+
+                _scene.value = _scene.value.next(
+                    status = Status.SUCCESS,
+                    act = VignetteList()
+                )
+            } catch (e: StateError) {
+                Timber.e(e, "Could not load vignettes when refreshing.")
+
+                publish {
+                    it.next(status = Status.ERROR, fault = e)
+                }
+            }
+        }
+    }
+
+    fun publish(action: (scene: Scene<Act, SharedPlot>) -> Scene<Act, SharedPlot>) {
+        _scene.value = action(_scene.value)
     }
 
 }

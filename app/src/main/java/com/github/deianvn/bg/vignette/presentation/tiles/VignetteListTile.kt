@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -18,36 +20,36 @@ import com.github.deianvn.bg.vignette.presentation.components.SwipeToDismissItem
 import com.github.deianvn.bg.vignette.state.model.VignetteEntry
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VignetteListTile(
-    vignetteEntries: List<VignetteEntry>,
     modifier: Modifier = Modifier,
-    onVignetteDismissed: (VignetteEntry) -> Unit = {}
+    isRefreshing: Boolean = false,
+    vignetteEntries: List<VignetteEntry>,
+    onVignetteDismissed: (VignetteEntry) -> Unit = {},
+    onRefreshRequested: () -> Unit = {}
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(top = 12.dp)
+    PullToRefreshBox(
+        modifier = modifier.fillMaxSize(),
+        isRefreshing = isRefreshing,
+        onRefresh = { onRefreshRequested() }
     ) {
-
-        Text(
-            modifier = Modifier.padding(horizontal = 12.dp),
-            text = stringResource(R.string.vignettes),
-            fontSize = 18.sp
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
         ) {
-            items(vignetteEntries) { entry ->
-                SwipeToDismissItem(
-                    item = { VignetteTile(entry.vignette) },
-                    onDismissed = {
-                        onVignetteDismissed(entry)
-                    }
-                )
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(vignetteEntries) { entry ->
+                    SwipeToDismissItem(
+                        item = { VignetteTile(entry) },
+                        onDismissed = {
+                            onVignetteDismissed(entry)
+                        }
+                    )
+                }
             }
         }
     }

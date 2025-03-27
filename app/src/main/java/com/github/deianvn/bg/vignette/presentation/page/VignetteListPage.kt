@@ -9,11 +9,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.github.deianvn.bg.vignette.R
 import com.github.deianvn.bg.vignette.presentation.dialog.NewVignetteDialog
 import com.github.deianvn.bg.vignette.presentation.layout.VignetteListLayout
 import com.github.deianvn.bg.vignette.presentation.tiles.VignetteListTile
 import com.github.deianvn.bg.vignette.state.model.Country
 import com.github.deianvn.bg.vignette.state.model.VignetteEntry
+
 
 @Composable
 fun VignetteListPage(
@@ -23,7 +26,8 @@ fun VignetteListPage(
     onNewVignetteRequested: () -> Unit = {},
     onNewVignetteCanceled: () -> Unit = {},
     onNewVignetteSubmitted: (countryCode: String, plate: String) -> Unit = { _, _ -> },
-    onVignetteDismissed: (VignetteEntry) -> Unit = {}
+    onVignetteDismissed: (VignetteEntry) -> Unit = {},
+    onRefreshRequested: () -> Unit = {}
 ) {
     VignetteListLayout(
         modifier = Modifier
@@ -33,14 +37,18 @@ fun VignetteListPage(
             VignetteListTile(
                 modifier = Modifier.fillMaxSize(),
                 vignetteEntries = vignetteEntries,
-                onVignetteDismissed = { onVignetteDismissed(it) }
+                onVignetteDismissed = { onVignetteDismissed(it) },
+                onRefreshRequested = { onRefreshRequested() }
             )
         },
         buttonComponent = {
             FloatingActionButton(
                 onClick = { onNewVignetteRequested() },
             ) {
-                Icon(Icons.Filled.Add, "Add Vignette")
+                Icon(
+                    Icons.Filled.Add,
+                    contentDescription =  stringResource(R.string.add_vignette_icon_desc)
+                )
             }
         }
     )

@@ -45,7 +45,28 @@ fun VignetteTile(
 
 @Composable
 private fun InactiveVignette(countryCode: String, plate: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Max)
+            .padding(18.dp)
+            .background(Color.White),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = plate,
+            color = Color.Black,
+            fontWeight = FontWeight.Medium
+        )
 
+        Text(
+            text = stringResource(R.string.inactive),
+            color = Color.Red,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Medium
+        )
+    }
 }
 
 @Composable

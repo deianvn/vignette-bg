@@ -1,10 +1,12 @@
 package com.github.deianvn.bg.vignette.state.repository
 
 import com.github.deianvn.bg.vignette.rest.api.BgTollApi
+import com.github.deianvn.bg.vignette.state.error.StateError
 import com.github.deianvn.bg.vignette.state.error.VignetteNotAvailableError
 import com.github.deianvn.bg.vignette.state.model.Vignette
 import com.github.deianvn.bg.vignette.state.model.VignetteEntry
 import com.github.deianvn.bg.vignette.utils.coroutines.DispatcherProvider
+import com.github.deianvn.bg.vignette.utils.error.toStateError
 import com.github.deianvn.bg.vignette.utils.preferences.SharedPrefStorage
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -41,14 +43,18 @@ class VignetteRepository(
             ?: emptyList()
     }
 
-    @Throws(VignetteNotAvailableError::class)
+    @Throws(StateError::class, VignetteNotAvailableError::class)
     suspend fun requestVignette(
         countryCode: String,
         plate: String
     ): Vignette {
-        val dto = bgTollApi.getVignette(countryCode, plate)
-        val vignette = dto.vignette
+        val dto = try {
+            bgTollApi.getVignette(countryCode, plate)
+        } catch (e: Exception) {
+            throw toStateError(e)
+        }
 
+        val vignette = dto.vignette
         val error = VignetteNotAvailableError(countryCode, plate)
 
         if (vignette == null) {

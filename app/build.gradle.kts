@@ -43,21 +43,24 @@ android {
 
 dependencies {
 
+    // Android
     val lifecycle = "2.8.7"
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycle")
     implementation("androidx.activity:activity-compose:1.10.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
 
-    val composebom = "2025.03.00"
+    // Compose
+    val composebom = "2025.03.01"
     implementation(platform("androidx.compose:compose-bom:$composebom"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.runtime:runtime-livedata")
+    implementation("androidx.glance:glance-appwidget:1.1.1")
 
     // Koin for Android
     implementation("io.insert-koin:koin-core:4.0.2")

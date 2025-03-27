@@ -8,6 +8,15 @@
     <string name="add">Add</string>
     <string name="seearch_country">Search countries...</string>
     <string name="no_countries_found">No countries found!</string>
+    <string name="inactive">Inactive</string>
+    <string name="bulgarian_flag_icon_desc">Bulgarian flag icon</string>
+    <string name="add_vignette_icon_desc">Add vignette icon</string>
+    <string name="delete_icon_desc">Delete icon</string>
+    <string name="error_network_error">Check your internet connection and try again!</string>
+    <string name="error_app_compatibility">You might not be using the latest version!</string>
+    <string name="error_server">Server might be down, try again later!</string>
+    <string name="error_general">An error occurred!</string>
+    <string name="retry">Retry</string>
 
     <plurals name="year_plural">
         <item quantity="one">year</item>

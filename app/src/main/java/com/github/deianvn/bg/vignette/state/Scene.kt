@@ -1,47 +1,51 @@
 package com.github.deianvn.bg.vignette.state
 
-import retrofit2.HttpException
-import java.io.IOException
+import com.github.deianvn.bg.vignette.state.error.StateError
 
 
-data class Scene<T, U : Plot<U>>(
+class Scene<T, U : Plot<U>>(
     val revision: Long = 0L,
     val act: T,
     val status: Status,
     private val plot: U,
-    val fault: Throwable? = null
+    val fault: StateError? = null,
+    private val previousHandler: () -> Unit = {}
 ) {
-    fun next() = copy(
-        revision = revision + 1L
-    )
+    private var previousScene: Scene<T, U>? = null
 
-    fun next(act: T, status: Status): Scene<T, U> = copy(
+    private var remembered = false
+
+    fun remember(): Scene<T, U> {
+        remembered = true
+        return this
+    }
+
+    fun previous(): Scene<T, U>? {
+        return previousScene?.also {
+            previousHandler()
+        }
+    }
+
+    fun next(
+        act: T = this.act,
+        status: Status = this.status,
+        plot: U = this.plot,
+        fault: StateError? = this.fault,
+        previousHandler: () -> Unit = this.previousHandler
+    ) = Scene(
         revision = revision + 1L,
         act = act,
         status = status,
-        fault = null
-    )
-
-    fun success(): Scene<T, U> = copy(
-        revision = revision + 1L,
-        status = Status.SUCCESS
-    )
-
-    fun fail(fault: Throwable): Scene<T, U> = copy(
-        revision = revision + 1L,
-        status = Status.ERROR, fault = fault
-    )
-
-    fun loading() = copy(
-        revision = revision + 1L,
-        status = Status.LOADING
-    )
+        plot = plot,
+        fault = fault,
+        previousHandler = previousHandler
+    ).also {
+        it.previousScene = if (remembered) {
+            this
+        } else {
+            previousScene
+        }
+    }
 
     val plotCopy get() = plot.copyObject()
 }
-
-fun Throwable?.isAuthError() = this is HttpException && this.code() == 401
-
-fun Throwable?.isForbiddenError() = this is HttpException && this.code() == 403
-
-fun Throwable?.isNetworkError() = this is IOException

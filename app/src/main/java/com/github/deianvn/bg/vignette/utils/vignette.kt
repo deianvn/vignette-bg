@@ -1,6 +1,15 @@
 package com.github.deianvn.bg.vignette.utils
 
+import org.joda.time.DateTimeZone
+import org.joda.time.Days
+import org.joda.time.Hours
 import org.joda.time.LocalDateTime
+import org.joda.time.Minutes
+import org.joda.time.Months
+import org.joda.time.Years
+
+
+val SOFIA_TIME_ZONE: DateTimeZone = DateTimeZone.forID("Europe/Sofia")
 
 
 enum class ValidityUnit {
@@ -19,30 +28,20 @@ data class ValidityMessage(
 fun createValidityMessage(
     validTo: LocalDateTime
 ): ValidityMessage {
-    val now = LocalDateTime.now()
+    val now = LocalDateTime.now(SOFIA_TIME_ZONE)
+
+    if (validTo < now) return ValidityMessage(0, ValidityUnit.MINUTE)
+
+    val yearsLeft = Years.yearsBetween(now, validTo).years
+    val monthsLeft = Months.monthsBetween(now, validTo).months
+    val daysLeft = Days.daysBetween(now, validTo).days
+    val hoursLeft = Hours.hoursBetween(now, validTo).hours
+
     return when {
-        validTo < now -> ValidityMessage(0, ValidityUnit.MINUTE)
-
-        validTo.year > now.year -> ValidityMessage(validTo.year - now.year, ValidityUnit.YEAR)
-
-        validTo.monthOfYear > now.monthOfYear -> ValidityMessage(
-            validTo.monthOfYear - now.monthOfYear,
-            ValidityUnit.MONTH
-        )
-
-        validTo.dayOfMonth > now.dayOfMonth -> ValidityMessage(
-            validTo.dayOfMonth - now.dayOfMonth,
-            ValidityUnit.DAY
-        )
-
-        validTo.hourOfDay > now.hourOfDay -> ValidityMessage(
-            validTo.hourOfDay - now.hourOfDay,
-            ValidityUnit.HOUR
-        )
-
-        else -> ValidityMessage(
-            validTo.minuteOfHour - now.minuteOfHour,
-            ValidityUnit.MINUTE
-        )
+        yearsLeft > 0 -> ValidityMessage(yearsLeft, ValidityUnit.YEAR)
+        monthsLeft > 0 -> ValidityMessage(monthsLeft, ValidityUnit.MONTH)
+        daysLeft > 0 -> ValidityMessage(daysLeft, ValidityUnit.DAY)
+        hoursLeft > 0 -> ValidityMessage(hoursLeft, ValidityUnit.HOUR)
+        else -> ValidityMessage(Minutes.minutesBetween(now, validTo).minutes, ValidityUnit.MINUTE)
     }
 }

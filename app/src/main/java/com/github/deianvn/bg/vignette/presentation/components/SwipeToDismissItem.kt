@@ -23,8 +23,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.github.deianvn.bg.vignette.R
 import kotlin.math.roundToInt
 
 @Composable
@@ -52,7 +54,11 @@ fun SwipeToDismissItem(item: @Composable () -> Unit, onDismissed: () -> Unit) {
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center
             ) {
-                Icon(imageVector = Icons.Default.Delete, "Delete", tint = Color.White)
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    tint = Color.White,
+                    contentDescription = stringResource(R.string.delete_icon_desc),
+                )
             }
         }
 
