@@ -3,34 +3,36 @@ package com.github.deianvn.bg.vignette.state
 import com.github.deianvn.bg.vignette.state.error.StateError
 
 
-class Scene<T, U : Plot<U>>(
+class Scene<A, P : Plot<P>>(
     val revision: Long = 0L,
-    val act: T,
+    val act: A,
     val status: Status,
-    private val plot: U,
+    private val plot: P,
     val fault: StateError? = null,
     private val previousHandler: () -> Unit = {}
 ) {
-    private var previousScene: Scene<T, U>? = null
+
+    private var previousScene: Scene<A, P>? = null
 
     private var remembered = false
 
-    fun remember(): Scene<T, U> {
+
+    fun remember(): Scene<A, P> {
         remembered = true
         return this
     }
 
-    fun previous(): Scene<T, U>? {
+    fun previous(): Scene<A, P>? {
         return previousScene?.also {
             previousHandler()
         }
     }
 
     fun next(
-        act: T = this.act,
-        status: Status = this.status,
-        plot: U = this.plot,
-        fault: StateError? = this.fault,
+        status: Status,
+        act: A = this.act,
+        plot: P = this.plot,
+        fault: StateError? = null,
         previousHandler: () -> Unit = this.previousHandler
     ) = Scene(
         revision = revision + 1L,

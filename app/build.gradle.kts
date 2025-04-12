@@ -63,9 +63,9 @@ dependencies {
     implementation("androidx.glance:glance-appwidget:1.1.1")
 
     // Koin for Android
-    implementation("io.insert-koin:koin-core:4.0.2")
-    implementation("io.insert-koin:koin-android:4.0.2")
-    implementation("io.insert-koin:koin-androidx-compose:4.0.2")
+    implementation("io.insert-koin:koin-core:4.0.4")
+    implementation("io.insert-koin:koin-android:4.0.4")
+    implementation("io.insert-koin:koin-androidx-compose:4.0.4")
 
     // Timber
     implementation("com.jakewharton.timber:timber:5.0.1")
@@ -82,7 +82,7 @@ dependencies {
     ksp("com.squareup.moshi:moshi-kotlin-codegen:1.15.2")
 
     // Joda
-    implementation("net.danlew:android.joda:2.13.0.1")
+    implementation("net.danlew:android.joda:2.13.1")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

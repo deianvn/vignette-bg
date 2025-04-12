@@ -30,7 +30,11 @@ import com.github.deianvn.bg.vignette.R
 import kotlin.math.roundToInt
 
 @Composable
-fun SwipeToDismissItem(item: @Composable () -> Unit, onDismissed: () -> Unit) {
+fun SwipeToDismissItem(
+    isEnabled: Boolean = true,
+    onDismissed: () -> Unit,
+    content: @Composable () -> Unit
+) {
     var offsetX by remember { mutableFloatStateOf(0f) }
     var itemWidth by remember { mutableFloatStateOf(1f) }
     var itemHeightDp by remember { mutableFloatStateOf(1f) }
@@ -72,17 +76,21 @@ fun SwipeToDismissItem(item: @Composable () -> Unit, onDismissed: () -> Unit) {
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures(
                         onHorizontalDrag = { _, dragAmount ->
-                            val newOffset = (offsetX + dragAmount).coerceAtLeast(0f)
-                            offsetX = newOffset.coerceAtMost(itemWidth)
+                            if (isEnabled) {
+                                val newOffset = (offsetX + dragAmount).coerceAtLeast(0f)
+                                offsetX = newOffset.coerceAtMost(itemWidth)
+                            }
                         },
                         onDragEnd = {
-                            when {
-                                offsetX >= autoDismissThreshold -> {
-                                    onDismissed()
-                                }
+                            if (isEnabled) {
+                                when {
+                                    offsetX >= autoDismissThreshold -> {
+                                        onDismissed()
+                                    }
 
-                                else -> {
-                                    offsetX = 0f
+                                    else -> {
+                                        offsetX = 0f
+                                    }
                                 }
                             }
                         },
@@ -94,7 +102,7 @@ fun SwipeToDismissItem(item: @Composable () -> Unit, onDismissed: () -> Unit) {
                 .offset { IntOffset(offsetX.roundToInt(), 0) }
                 .background(Color.White)
         ) {
-            item()
+            content()
         }
     }
 }

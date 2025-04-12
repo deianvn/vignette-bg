@@ -1,8 +1,8 @@
 package com.github.deianvn.bg.vignette.di
 
 import com.github.deianvn.bg.vignette.rest.api.BgTollApi
-import com.github.deianvn.bg.vignette.utils.interceptor.DebugRetrofitInterceptor
-import com.github.deianvn.bg.vignette.utils.moshi.MoshiLocalDateTimeAdapter
+import com.github.deianvn.bg.vignette.rest.interceptor.DebugRetrofitInterceptor
+import com.github.deianvn.bg.vignette.rest.serialization.MoshiLocalDateTimeAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient

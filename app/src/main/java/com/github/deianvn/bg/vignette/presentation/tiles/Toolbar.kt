@@ -16,7 +16,9 @@ import androidx.compose.ui.unit.dp
 import com.github.deianvn.bg.vignette.R
 
 @Composable
-fun Toolbar() {
+fun Toolbar(
+    text: String
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -27,6 +29,6 @@ fun Toolbar() {
             contentDescription = stringResource(R.string.bulgarian_flag_icon_desc)
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text = stringResource(R.string.vignettes))
+        Text(text = text)
     }
 }

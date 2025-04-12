@@ -1,4 +1,4 @@
-package com.github.deianvn.bg.vignette.utils.moshi
+package com.github.deianvn.bg.vignette.rest.serialization
 
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.ToJson

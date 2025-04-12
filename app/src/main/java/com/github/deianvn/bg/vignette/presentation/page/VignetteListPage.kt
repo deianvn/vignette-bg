@@ -23,6 +23,7 @@ fun VignetteListPage(
     vignetteEntries: List<VignetteEntry>,
     countries: List<Country>,
     showAddVignetteDialog: Boolean = false,
+    isRefreshing: Boolean = false,
     onNewVignetteRequested: () -> Unit = {},
     onNewVignetteCanceled: () -> Unit = {},
     onNewVignetteSubmitted: (countryCode: String, plate: String) -> Unit = { _, _ -> },
@@ -37,6 +38,7 @@ fun VignetteListPage(
             VignetteListTile(
                 modifier = Modifier.fillMaxSize(),
                 vignetteEntries = vignetteEntries,
+                isRefreshing = isRefreshing,
                 onVignetteDismissed = { onVignetteDismissed(it) },
                 onRefreshRequested = { onRefreshRequested() }
             )

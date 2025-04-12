@@ -1,4 +1,4 @@
-package com.github.deianvn.bg.vignette.utils.error
+package com.github.deianvn.bg.vignette.utils
 
 import com.github.deianvn.bg.vignette.state.error.AuthenticationError
 import com.github.deianvn.bg.vignette.state.error.AuthorizationError

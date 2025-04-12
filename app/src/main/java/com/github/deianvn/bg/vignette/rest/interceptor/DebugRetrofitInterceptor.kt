@@ -1,4 +1,4 @@
-package com.github.deianvn.bg.vignette.utils.interceptor
+package com.github.deianvn.bg.vignette.rest.interceptor
 
 import okhttp3.Interceptor
 import okhttp3.Request

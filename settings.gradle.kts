@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "BgVignette"
+rootProject.name = "vignette-bg"
 include(":app")

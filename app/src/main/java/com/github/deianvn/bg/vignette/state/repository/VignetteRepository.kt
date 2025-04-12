@@ -6,8 +6,8 @@ import com.github.deianvn.bg.vignette.state.error.VignetteNotAvailableError
 import com.github.deianvn.bg.vignette.state.model.Vignette
 import com.github.deianvn.bg.vignette.state.model.VignetteEntry
 import com.github.deianvn.bg.vignette.utils.coroutines.DispatcherProvider
-import com.github.deianvn.bg.vignette.utils.error.toStateError
-import com.github.deianvn.bg.vignette.utils.preferences.SharedPrefStorage
+import com.github.deianvn.bg.vignette.utils.toStateError
+import com.github.deianvn.bg.vignette.utils.storage.SharedPrefStorage
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import kotlinx.coroutines.withContext
@@ -41,6 +41,14 @@ class VignetteRepository(
 
         return@withContext moshi.adapter<List<VignetteEntry>>(listType).fromJson(json)
             ?: emptyList()
+    }
+
+    suspend fun getVignetteEntry(
+        countryCode: String, plate: String
+    ): VignetteEntry? = withContext(dispatcherProvider.io) {
+        return@withContext retrieveVignetteEntries().find {
+            it.countryCode == countryCode && it.plate == plate
+        }
     }
 
     @Throws(StateError::class, VignetteNotAvailableError::class)

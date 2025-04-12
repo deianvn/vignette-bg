@@ -18,14 +18,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.deianvn.bg.vignette.R
 import com.github.deianvn.bg.vignette.presentation.page.LoadingDataPage
 import com.github.deianvn.bg.vignette.presentation.page.VignetteListPage
 import com.github.deianvn.bg.vignette.presentation.tiles.Toolbar
 import com.github.deianvn.bg.vignette.state.Status
-import com.github.deianvn.bg.vignette.state.step.Prerequisites
-import com.github.deianvn.bg.vignette.state.step.VignetteList
+import com.github.deianvn.bg.vignette.state.act.PrerequisitesAct
+import com.github.deianvn.bg.vignette.state.act.VignetteListAct
 import getErrorMessageResource
 import org.koin.androidx.compose.koinViewModel
 
@@ -49,7 +50,7 @@ class MainActivity : ComponentActivity() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Toolbar() }
+                    title = { Toolbar(stringResource(R.string.vignettes)) }
                 )
             },
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
@@ -92,12 +93,14 @@ private fun Content(
                 }
             }
         }
+
         Status.SUCCESS -> when (act) {
-            is Prerequisites -> LoadingDataPage()
-            is VignetteList -> VignetteListPage(
+            is PrerequisitesAct -> LoadingDataPage()
+            is VignetteListAct -> VignetteListPage(
                 vignetteEntries = scene.plotCopy.vignetteEntries,
                 plot.countries,
                 act.isNewVignetteRequested,
+                isRefreshing = act.isRefreshing,
                 onNewVignetteRequested = { viewModel.newVignetteRequested() },
                 onNewVignetteCanceled = { viewModel.newVignetteCanceled() },
                 onNewVignetteSubmitted = { countryCode, plate ->
@@ -109,6 +112,9 @@ private fun Content(
                 onVignetteDismissed = { viewModel.removeVignetteEntry(it) },
                 onRefreshRequested = { viewModel.refreshVignettes() }
             )
+
+            else -> {
+            }
         }
     }
 }

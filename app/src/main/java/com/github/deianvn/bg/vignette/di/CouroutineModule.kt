@@ -13,6 +13,8 @@ val CoroutineModule = module {
                 get() = Dispatchers.IO
             override val ui: CoroutineDispatcher
                 get() = Dispatchers.Main
+            override val default: CoroutineDispatcher
+                get() = Dispatchers.Default
 
         } as DispatcherProvider
     }

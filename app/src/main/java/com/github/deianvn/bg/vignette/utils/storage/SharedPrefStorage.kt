@@ -1,4 +1,4 @@
-package com.github.deianvn.bg.vignette.utils.preferences
+package com.github.deianvn.bg.vignette.utils.storage
 
 import android.content.Context
 import androidx.annotation.WorkerThread
