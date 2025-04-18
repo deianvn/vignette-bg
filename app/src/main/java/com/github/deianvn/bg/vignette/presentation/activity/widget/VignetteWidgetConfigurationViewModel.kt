@@ -10,13 +10,20 @@ import com.github.deianvn.bg.vignette.state.repository.WidgetRepository
 import com.github.deianvn.bg.vignette.state.act.Act
 import com.github.deianvn.bg.vignette.state.act.VignetteSaveSelectionAct
 import com.github.deianvn.bg.vignette.state.act.VignetteSelectionListAct
+import com.github.deianvn.bg.vignette.state.error.StateError
+import com.github.deianvn.bg.vignette.state.error.VignetteEntryNotAvailable
+import com.github.deianvn.bg.vignette.state.error.VignetteNotAvailableError
+import com.github.deianvn.bg.vignette.state.model.Vignette
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.lang.Exception
 
 
 class VignetteWidgetConfigurationViewModel(
     private val vignetteRepository: VignetteRepository,
-    private val widgetRepository: WidgetRepository
+    private val widgetRepository: WidgetRepository,
+    private val moshi: Moshi
 ) : StateViewModel<Act, EmptyPlot>(
     Status.LOADING, VignetteSelectionListAct(), EmptyPlot()
 ) {
@@ -60,10 +67,58 @@ class VignetteWidgetConfigurationViewModel(
                 VignetteWidgetEntry(widgetId = widgetId, countryCode = countryCode, plate = plate)
             )
 
+            val vignetteEntries = vignetteRepository.retrieveVignetteEntries()
+            val vignetteEntry = vignetteEntries.find {
+                it.countryCode == countryCode && it.plate == plate
+            }
+
+            if (vignetteEntry == null) {
+                publish {
+                    it.next(
+                        status = Status.ERROR,
+                        fault = VignetteEntryNotAvailable(countryCode, plate)
+                    )
+                }
+
+                return@launch
+            }
+
+            val vignette = try {
+                vignetteRepository.requestVignette(countryCode, plate)
+            } catch (e: StateError) {
+                publish {
+                    it.next(
+                        status = Status.ERROR,
+                        fault = e
+                    )
+                }
+
+                return@launch
+            }
+
+            val serializedVignette = try {
+                moshi.adapter(Vignette::class.java).toJson(vignette)
+            } catch (_: Exception) {
+                publish {
+                    it.next(
+                        status = Status.ERROR,
+                        fault = VignetteNotAvailableError(countryCode, plate)
+                    )
+                }
+
+                return@launch
+            }
+
+            vignetteEntry.vignette = vignette
+            vignetteRepository.storeVignetteEntries(vignetteEntries)
+
             publish {
                 it.next(
                     status = Status.SUCCESS,
-                    act = VignetteSaveSelectionAct(widgetId)
+                    act = VignetteSaveSelectionAct(
+                        widgetId,
+                        serializedVignette
+                    )
                 )
             }
         }

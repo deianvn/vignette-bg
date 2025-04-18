@@ -14,7 +14,7 @@ import org.koin.dsl.module
 val BusinessModule = module {
 
     single {
-        SharedPrefStorage(androidApplication())
+        SharedPrefStorage(androidApplication(), get())
     }
 
     single {
@@ -34,7 +34,7 @@ val BusinessModule = module {
     }
 
     viewModel {
-        VignetteWidgetConfigurationViewModel(get(), get())
+        VignetteWidgetConfigurationViewModel(get(), get(), get())
     }
 
 }

@@ -10,6 +10,8 @@ import com.github.deianvn.bg.vignette.utils.toStateError
 import com.github.deianvn.bg.vignette.utils.storage.SharedPrefStorage
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 
@@ -26,28 +28,36 @@ class VignetteRepository(
         List::class.java, VignetteEntry::class.java
     )
 
+    private val mutex = Mutex()
+
     suspend fun storeVignetteEntries(vignetteEntries: List<VignetteEntry>) = withContext(
         dispatcherProvider.io
     ) {
-        val json = moshi.adapter(List::class.java).toJson(vignetteEntries)
-        sharedPrefStorage.putString(KEY_VIGNETTE_CONFIGS, json)
+        mutex.withLock {
+            val json = moshi.adapter(List::class.java).toJson(vignetteEntries)
+            sharedPrefStorage.putString(KEY_VIGNETTE_CONFIGS, json)
+        }
     }
 
     suspend fun retrieveVignetteEntries(): List<VignetteEntry> = withContext(
         dispatcherProvider.io
     ) {
-        val json = sharedPrefStorage
-            .getString(KEY_VIGNETTE_CONFIGS) ?: return@withContext emptyList()
+        mutex.withLock {
+            val json = sharedPrefStorage
+                .getString(KEY_VIGNETTE_CONFIGS) ?: return@withContext emptyList()
 
-        return@withContext moshi.adapter<List<VignetteEntry>>(listType).fromJson(json)
-            ?: emptyList()
+            moshi.adapter<List<VignetteEntry>>(listType).fromJson(json)
+                ?: emptyList()
+        }
     }
 
     suspend fun getVignetteEntry(
         countryCode: String, plate: String
     ): VignetteEntry? = withContext(dispatcherProvider.io) {
-        return@withContext retrieveVignetteEntries().find {
-            it.countryCode == countryCode && it.plate == plate
+        mutex.withLock {
+            retrieveVignetteEntries().find {
+                it.countryCode == countryCode && it.plate == plate
+            }
         }
     }
 

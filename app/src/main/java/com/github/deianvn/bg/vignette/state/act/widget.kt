@@ -13,7 +13,10 @@ class VignetteSelectionListAct(
     val vignettes: List<VignetteEntry> = emptyList()
 ) : WidgetConfigAct()
 
-class VignetteSaveSelectionAct(val widgetId: Int = 0) : WidgetConfigAct()
+class VignetteSaveSelectionAct(
+    val widgetId: Int = 0,
+    val serializedVignette: String? = null
+) : WidgetConfigAct()
 
 
 sealed class WidgetUpdateAct : WidgetAct()

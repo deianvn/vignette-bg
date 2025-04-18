@@ -22,7 +22,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.appwidget.GlanceAppWidgetManager
+import androidx.glance.appwidget.state.updateAppWidgetState
+import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.deianvn.bg.vignette.R
 import com.github.deianvn.bg.vignette.presentation.page.LoadingDataPage
@@ -53,6 +56,10 @@ class VignetteWidgetConfigurationActivity : ComponentActivity() {
             return
         }
 
+        // Set the result to CANCELED.  This will cause the widget host to cancel
+        // out of the widget placement if the user presses the back button.
+        setResult(RESULT_CANCELED)
+
         setContent {
             val snackbarHostState = remember { SnackbarHostState() }
 
@@ -74,6 +81,7 @@ class VignetteWidgetConfigurationActivity : ComponentActivity() {
             }
         }
     }
+
 
     @Composable
     private fun Content(
@@ -111,24 +119,45 @@ class VignetteWidgetConfigurationActivity : ComponentActivity() {
 
                     if (activity != null) {
                         LaunchedEffect(scene) {
+
                             val glanceId = GlanceAppWidgetManager(context)
                                 .getGlanceIdBy(act.widgetId)
-                            VignetteWidget().update(activity, glanceId)
 
-                            activity.apply {
-                                setResult(RESULT_OK, Intent().apply {
-                                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, act.widgetId)
-                                })
-                                finish()
-                            }
+                            updateAppWidgetState(
+                                context = context,
+                                definition = PreferencesGlanceStateDefinition,
+                                glanceId = glanceId,
+                                updateState = { prefs ->
+                                    val mutablePrefs = prefs.toMutablePreferences()
+                                    if (act.serializedVignette != null) {
+                                        mutablePrefs[VignetteWidget.keyVignette] = act.serializedVignette
+
+                                        VignetteWidget().update(activity, glanceId)
+
+                                        activity.apply {
+                                            setResult(RESULT_OK, Intent().apply {
+                                                putExtra(
+                                                    AppWidgetManager.EXTRA_APPWIDGET_ID,
+                                                    act.widgetId
+                                                )
+                                            })
+                                        }
+
+                                    } else {
+                                        mutablePrefs.remove(VignetteWidget.keyVignette)
+                                    }
+                                    mutablePrefs
+                                }
+                            )
                         }
+
+                        finish()
                     }
                 }
 
-                else -> {
-                }
+                else -> {}
             }
         }
     }
-
 }
+

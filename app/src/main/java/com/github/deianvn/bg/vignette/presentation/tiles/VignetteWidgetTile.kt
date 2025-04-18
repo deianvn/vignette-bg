@@ -2,8 +2,6 @@ package com.github.deianvn.bg.vignette.presentation.tiles
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
@@ -21,24 +19,18 @@ import androidx.glance.layout.width
 import androidx.glance.text.Text
 import com.github.deianvn.bg.vignette.R
 import com.github.deianvn.bg.vignette.state.model.Vignette
-import com.github.deianvn.bg.vignette.state.model.VignetteEntry
 import com.github.deianvn.bg.vignette.utils.ValidityUnit
 import com.github.deianvn.bg.vignette.utils.createValidityMessage
 
 
 @Composable
 fun VignetteWidgetTile(
-    vignetteEntry: VignetteEntry?,
+    vignette: Vignette?,
     modifier: GlanceModifier = GlanceModifier
 ) {
-    val vignette = vignetteEntry?.vignette
     Box(modifier = modifier) {
         if (vignette == null || vignette.isExpired()) {
-            if (vignetteEntry != null) {
-                InactiveVignette(vignetteEntry.countryCode, vignetteEntry.plate)
-            } else {
-                Box(modifier = GlanceModifier.fillMaxSize().background(Color.Red)) {
-                }
+            Box(modifier = GlanceModifier.fillMaxSize().background(Color.Red)) {
             }
         } else {
             ActiveVignette(vignette)
